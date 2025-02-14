@@ -1,0 +1,24 @@
+CC = g++
+CFLAG = -g -Wall -c --std=c++17
+SOURCES = Car.cpp\
+		Bus.cpp\
+		Bike.cpp\
+		Tempo.cpp\
+		Vehicle.cpp\
+		VehicleFactory.cpp
+TARGET = libVehicleStatic.a
+HEADER = Car.h\
+		Bus.h\
+		Bike.h\
+		Tempo.h\
+		Vehicle.h
+OBJECTS = $(SOURCES:.cpp=.o)
+
+$(TARGET) : $(OBJECTS)
+	ar rcs $(TARGET) $(OBJECTS)
+
+.cpp.o :
+	$(CC) $(CFLAG) $< -o $@
+
+clean :
+	rm -f $(OBJECTS) $(TARGET)

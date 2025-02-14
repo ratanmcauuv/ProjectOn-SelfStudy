@@ -1,0 +1,22 @@
+CC = g++
+CFLAG = -g -c -fPIC -Wall --std=c++17
+LINKFLAG = -shared -o
+SOURCES = TataMotors.cpp\
+		Mahindra.cpp\
+		AbsVehicleFactory.cpp\
+		AutoMobileFactory.cpp
+TARGET = libAutoMobFactoryShared.so
+HEADER = TataMotors.h\
+		Mahindra.h\
+		AbsVehicleFactory.h\
+		AutoMobileFactory.h
+OBJECTS = $(SOURCES:.cpp=.o)
+
+$(TARGET) : $(OBJECTS)
+	$(CC) $(LINKFLAG) $(TARGET) $(OBJECTS)
+
+.cpp.o:
+	$(CC) $(CFLAG) $< -o $@
+
+clean :
+	rm -f $(OBJECTS) $(TARGET)

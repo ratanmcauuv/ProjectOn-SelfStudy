@@ -1,0 +1,27 @@
+CC = g++
+CFLAG = -g -Wall -c --std=c++17
+SOURCES = TataMotors.cpp\
+		Mahindra.cpp\
+		AbsVehicleFactory.cpp\
+		AutoMobileFactory.cpp\
+		AbsCar.cpp\
+		MahindraCar.cpp\
+		TataCar.cpp
+TARGET = libAutoMobFactoryStatic.a
+HEADER = TataMotors.h\
+		Mahindra.h\
+		AbsVehicleFactory.h\
+		AutoMobileFactory.h\
+		AbsCar.h\
+		MahindraCar.h\
+		TataCar.h
+OBJECTS = $(SOURCES:.cpp=.o)
+
+$(TARGET) : $(OBJECTS)
+	ar rcs $(TARGET) $(OBJECTS)
+
+.cpp.o :
+	$(CC) $(CFLAG) $< -o $@
+
+clean :
+	rm -f $(OBJECTS) $(TARGET)

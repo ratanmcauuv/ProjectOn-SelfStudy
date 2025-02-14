@@ -1,0 +1,25 @@
+CC = g++
+CFLAG = -g -c -fPIC -Wall --std=c++17
+LINKFLAG = -shared -o
+SOURCES = Car.cpp\
+			Bus.cpp\
+			Bike.cpp\
+			Tempo.cpp\
+			Vehicle.cpp\
+			VehicleFactory.cpp
+TARGET = libVehicleShared.so
+HEADER = Car.h\
+			Bus.h\
+			Bike.h\
+			Tempo.h\
+			Vehicle.h
+OBJECTS = $(SOURCES:.cpp=.o)
+
+$(TARGET) : $(OBJECTS)
+	$(CC) $(LINKFLAG) $(TARGET) $(OBJECTS)
+
+.cpp.o:
+	$(CC) $(CFLAG) $< -o $@
+
+clean :
+	rm -f $(OBJECTS) $(TARGET)
