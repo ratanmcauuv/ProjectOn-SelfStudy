@@ -123,6 +123,7 @@ unsigned long tbToByte(int n) {
     return n << 29;
 }
 
+/*Testing Functionality for Bit manipulations*/
 int main()
 {
     int n = 12;
