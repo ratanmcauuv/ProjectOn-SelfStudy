@@ -16,14 +16,16 @@ class List
     }
     ~List() {
         std::cout << "~List()\n";
-        while(size_) {
+        while(size_) 
             deleteFromEnd();
-        }
     }
     void insertAtBegining(int n);
     void appendAtEnd(int n);
     void deleteFromBegining();
     void deleteFromEnd();
+    void reverseList();
+    NODE getMidNodeFromList();
+    bool checkIfCylic();
     void showList();
     int getLength() const {
         return size_;
@@ -101,7 +103,7 @@ void List :: deleteFromBegining()
 //10->40->50->60
 void List :: deleteFromEnd()
 {
-     if(header_ == nullptr) {
+    if(header_ == nullptr) {
         std::cout << "List Empty, Nothing to delete!!\n";
         return;
     }
@@ -119,6 +121,66 @@ void List :: deleteFromEnd()
     }
     size_--;  
 }
+//10->40->50->60
+//header -> 10 -> 20
+void List::reverseList()
+{
+    if(header_ == nullptr) {
+        std::cout << "List Empty\n";
+        return;
+    }
+    NODE curr = header_;
+    NODE prev = nullptr;
+    NODE next = nullptr;
+
+    while(curr != nullptr)
+    {
+        next = curr->next;
+        curr->next = prev;
+        prev = curr;
+        curr = next;
+    }
+    header_ = prev;
+}
+
+NODE List::getMidNodeFromList()
+{
+    if(header_ == nullptr) {
+        std::cout << "List Empty\n";
+        return header_;
+    }
+    NODE fastPtr, slowPtr;
+    fastPtr = slowPtr = header_;
+
+    while(fastPtr->next->next != nullptr)
+    {
+        fastPtr = fastPtr->next->next;
+        slowPtr = slowPtr->next;
+    }
+    return slowPtr;
+}
+
+bool List :: checkIfCylic()
+{
+    bool cyclicFlag = false;
+    if(header_ == nullptr) {
+        std::cout << "List Empty\n";
+        return cyclicFlag;
+    }
+
+    NODE fastPtr, slowPtr;
+    fastPtr = slowPtr = header_;
+    while(fastPtr->next->next != nullptr)
+    {
+        fastPtr = fastPtr->next->next;
+        slowPtr = slowPtr->next;
+        if(fastPtr == slowPtr) {
+            cyclicFlag = true;
+            break;
+        }
+    }
+    return cyclicFlag;
+}
 
 int main()
 {
@@ -127,12 +189,19 @@ int main()
     L.insertAtBegining(20);
     L.insertAtBegining(30);
     L.showList();
-    
+
     L.appendAtEnd(40);
     L.appendAtEnd(50);
     L.appendAtEnd(60);
     L.showList();
     
+    NODE mid_node = L.getMidNodeFromList();
+    if(mid_node) {
+        std::cout << "Mid Node ::: " << mid_node->data << std::endl;
+    }
+
+    L.checkIfCylic() ? (std::cout << "CYCLIC\n") : (std::cout << "Not CYCLIC\n");
+
     L.deleteFromBegining();
     L.deleteFromBegining();
     L.showList();
@@ -140,6 +209,9 @@ int main()
     L.deleteFromEnd();
     L.deleteFromEnd();
     L.showList();
-    
+
+    L.reverseList();
+    L.showList();
+
     return 0;
 }
