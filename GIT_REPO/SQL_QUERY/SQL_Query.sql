@@ -7,7 +7,7 @@ main: /home/ratan/mydb r/w
 sqlite> .databases;
 
 CREATE TABLE Employeeloyee (
-  EmployeeNO NUMBER(4) NOT NULL, 
+  EmployeeNO NUMBER(4) NOT NULL,
   ENAME VARCHAR2(10), 
   JOB VARCHAR2(9), 
   MGR NUMBER(4), 
@@ -134,7 +134,7 @@ FROM Employee
 GROUP BY empno, ename
 HAVING COUNT(*) > 1; 
 
---GETTING SECOND HIGHEST SALARY FROM EmployeeLOYEE
+--GETTING SECOND HIGHEST SALARY FROM Employee
 SELECT * FROM Employee
 ORDER BY SAL DESC LIMIT 1,1;
 
@@ -146,15 +146,18 @@ SELECT * FROM Employee WHERE SAL = (
 SELECT MAX(SAL) FROM Employee
 WHERE SAL < (SELECT MAX(SAL) FROM Employee));
 
-SELECT * FROM Employee 
-WHERE SAL = (SELECT DISTINCT(sal) FROM Employee ORDER BY SAL desc LIMIT 1,1)
+--Getting nth highest salary from an Employee
+sqlite> SELECT * FROM Employee WHERE sal = (
+SELECT DISTINCT(sal)
+FROM Employee ORDER BY sal DESC LIMIT 3,1);
 
-EMPNO  ENAME  JOB      MGR   HIREDATE     SAL   COMM  DEPTNO
------  -----  -------  ----  -----------  ----  ----  ------
-7788   SCOTT  ANALYST  7566  09-MAR-1982  3000        20    
-7902   FORD   ANALYST  7566  3-MAR-1981   3000        20    
+EMPNO  ENAME  JOB      MGR   HIREDATE    SAL   COMM  DEPTNO
+-----  -----  -------  ----  ----------  ----  ----  ------
+7698   BLAKE  MANAGER  7839  1-MAR-1981  2850        30
 sqlite> 
 
+SELECT DISTINCT TOP 4 sal
+FROM Employee ORDER BY sal DESC;
 --
 
 SELECT e.ename, m.ename, e.deptno, d.dname, d.loc
@@ -166,20 +169,20 @@ ORDER BY e.deptno;
 
 ENAME   ENAME  DEPTNO  DNAME       LOC     
 ------  -----  ------  ----------  --------
-                       OPERATIONS  BOSTON  
+                       OPERATIONS  BOSTON
 CLARK   KING   10      ACCOUNTING  NEW YORK
 MILLER  CLARK  10      ACCOUNTING  NEW YORK
-SMITH   FORD   20      RESEARCH    DALLAS  
-JONES   KING   20      RESEARCH    DALLAS  
-SCOTT   JONES  20      RESEARCH    DALLAS  
-ADAMS   SCOTT  20      RESEARCH    DALLAS  
-FORD    JONES  20      RESEARCH    DALLAS  
-ALLEN   BLAKE  30      SALES       CHICAGO 
-WARD    BLAKE  30      SALES       CHICAGO 
-MARTIN  BLAKE  30      SALES       CHICAGO 
-BLAKE   KING   30      SALES       CHICAGO 
-TURNER  BLAKE  30      SALES       CHICAGO 
-JAMES   BLAKE  30      SALES       CHICAGO 
+SMITH   FORD   20      RESEARCH    DALLAS
+JONES   KING   20      RESEARCH    DALLAS
+SCOTT   JONES  20      RESEARCH    DALLAS
+ADAMS   SCOTT  20      RESEARCH    DALLAS
+FORD    JONES  20      RESEARCH    DALLAS
+ALLEN   BLAKE  30      SALES       CHICAGO
+WARD    BLAKE  30      SALES       CHICAGO
+MARTIN  BLAKE  30      SALES       CHICAGO
+BLAKE   KING   30      SALES       CHICAGO
+TURNER  BLAKE  30      SALES       CHICAGO
+JAMES   BLAKE  30      SALES       CHICAGO
 sqlite> 
 
 -- INTERVIEW_QUESTIONS --
@@ -197,6 +200,109 @@ ACCOUNTING  10      3          2916.66666666667
 RESEARCH    20      5          2175.0          
 SALES       30      6          1566.66666666667
 
+----------------------------------------------------------
+
+EMPNO  ENAME   JOB        MGR   HIREDATE     SAL   COMM  DEPTNO
+-----  ------  ---------  ----  -----------  ----  ----  ------
+
+sqlite>
+SELECT
+  r.dname,
+  r.deptno,
+  r.NO_OF_EMP,
+  e.ename,
+  e.job,
+  e.sal
+FROM
+  employee e
+  INNER JOIN (
+    SELECT
+      d.DNAME as dname,
+      d.DEPTNO as deptno,
+      COUNT(*) AS NO_OF_EMP,
+      MAX(SAL) AS max_sal
+    FROM
+      Employee e
+      INNER JOIN Dept d ON e.deptno = d.deptno
+    GROUP BY
+      d.DNAME,
+      d.DEPTNO
+  ) as r ON e.sal = r.max_sal
+  and e.deptno = r.deptno
+ORDER BY
+  r.deptno;
+
+dname       deptno  NO_OF_EMP  ENAME  JOB        SAL
+----------  ------  ---------  -----  ---------  ----
+ACCOUNTING  10      3          KING   PRESIDENT  5000
+RESEARCH    20      5          SCOTT  ANALYST    3000
+RESEARCH    20      5          FORD   ANALYST    3000
+SALES       30      6          BLAKE  MANAGER    2850
+sqlite>
+
+--------------------------------------------------------------------
+--NOTE : If no join, then CrossProduct will happen.
+
+sqlite> SELECT  COUNT(*) FROM Employee;
+COUNT(*)
+--------
+14
+sqlite> SELECT  COUNT(*) FROM Dept;
+COUNT(*)
+--------
+4
+sqlite> SELECT COUNT(*) FROM Employee, Dept;
+COUNT(*)
+--------
+56
+sqlite>
+
+--------------------------------------------------------------------
+sqlite> .show
+        echo: off
+         eqp: off
+     explain: auto
+     headers: on
+        mode: column --wrap 60 --wordwrap off --noquote
+   nullvalue: ""
+      output: stdout
+colseparator: "|"
+rowseparator: "\n"
+       stats: off
+       width: 0 0 0 0 0 0 0 0 0 0 0
+    filename: mydb
 
 
+-----------------------------------------------
+sqlite3 mydb --header --column "SELECT * FROM Employee, Dept" > Dept.txt
 
+ratan@ratan-VirtualBox:~$ sed -n "40,45 p" Dept.txt | grep -i "CLERK"
+7876   ADAMS   CLERK      7788  12-MAR-1983  1100        20      10      ACCOUNTING  NEW YORK
+7876   ADAMS   CLERK      7788  12-MAR-1983  1100        20      20      RESEARCH    DALLAS
+7876   ADAMS   CLERK      7788  12-MAR-1983  1100        20      30      SALES       CHICAGO
+
+----------
+ratan@ratan-VirtualBox:~/Desktop$ cat SomeCmds.txt
+cal 12
+date
+whoami
+pwd
+ls -ltr
+env
+
+ratan@ratan-VirtualBox:~/Desktop$ cat SomeCmdToExec.sh
+#! /bin/bash
+
+while read cmd
+do
+	echo "Cmd : " "$cmd"
+	$cmd > /dev/null
+	if [ $? -eq 0 ]
+	then
+		echo "$cmd is Excuted Successfully."
+	else
+		echo "command Exceution Failed !!!"
+	fi
+done < ./SomeCmds.txt
+
+---------------------------------------------------
